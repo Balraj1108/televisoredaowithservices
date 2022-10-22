@@ -3,6 +3,8 @@ package it.prova.televisoredaowithservices.test;
 import it.prova.televisoredaowithservices.service.MyServiceFactory;
 import it.prova.televisoredaowithservices.service.televisore.TelevisoreService;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +31,9 @@ public class TestTelevisore {
 			System.out.println("In tabella ci sono " + televisoreService.listAll().size() + " elementi.");
 
 			testUpdateTelevisore(televisoreService);
+			System.out.println("In tabella ci sono " + televisoreService.listAll().size() + " elementi.");
+			
+			testTelevisoriProdottiIntervalloDate(televisoreService);
 			System.out.println("In tabella ci sono " + televisoreService.listAll().size() + " elementi.");
 			
 		} catch (Exception e) {
@@ -111,6 +116,26 @@ public class TestTelevisore {
 			throw new RuntimeException("testUpdateUser FAILED ");
 
 		System.out.println(".......testUpdateTelevisore PASSED.............");
+	}
+	
+	
+	private static void testTelevisoriProdottiIntervalloDate(TelevisoreService televisoreService) throws Exception {
+		System.out.println(".......testTelevisoriProdottiIntervalloDate inizio.............");
+		List<Televisore> listaTelevisoriDate = new ArrayList<>();
+		
+		Date dataBefore = new SimpleDateFormat("dd-MM-yyyy").parse("10-9-2015");
+		Date dataAfter = new SimpleDateFormat("dd-MM-yyyy").parse("10-9-2023");
+		
+		listaTelevisoriDate = televisoreService.televisoriProdottiIntervalloDate(dataBefore, dataAfter);
+		
+		for (Televisore televisore : listaTelevisoriDate) {
+			if (televisore.getDataProduzione().compareTo(dataBefore) <= 0 
+					|| televisore.getDataProduzione().compareTo(dataAfter) >= 0 ) {
+				throw new RuntimeException("Test fallito");
+			}			
+		}
+		System.out.println(".......testTelevisoriProdottiIntervalloDate inizio.............");
+		
 	}
 	
 	
