@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -18,7 +19,6 @@ public class TelevisoreDAOImpl extends AbstractMySQLDAO implements TelevisoreDAO
 	public void setConnection(Connection connection) {
 		this.connection = connection;
 	}
-	
 	
 	
 	@Override
@@ -236,14 +236,66 @@ public class TelevisoreDAOImpl extends AbstractMySQLDAO implements TelevisoreDAO
 
 	@Override
 	public Televisore televisorePiuGrande() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		if (isNotActive())
+			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
+		
+		Televisore result = null;
+		
+		try (PreparedStatement ps = connection.prepareStatement("select * from televisore where  pollici = (select max(pollici) from televisore);")) {
+			
+			try (ResultSet rs = ps.executeQuery();) {
+				if (rs.next()) {
+					result = new Televisore();
+					result.setMarca(rs.getString("marca"));
+					result.setModello(rs.getString("modello"));
+					result.setPollici(rs.getInt("pollici"));
+					result.setDataProduzione(rs.getDate("dataproduzione"));
+					result.setId(rs.getLong("ID"));
+				}
+			} // niente catch qui
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return result;
 	}
 
 	@Override
 	public List<String> marcheTelevisoriUltimiSeiMesi() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		
+		if (isNotActive())
+			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
+		
+		List<String> result = new ArrayList<>();
+		Televisore teleTemp = null;
+		Date dataOggi = new Date(); // data di oggi
+		
+		Calendar dataMenoSeiMesi = Calendar.getInstance();
+		dataMenoSeiMesi.setTime(new Date());
+		dataMenoSeiMesi.add(Calendar.MONTH, -6);//date 6 mesi fa ma in calendar
+		
+		try (PreparedStatement ps = connection.prepareStatement("select * from televisore where dataproduzione  between ? and ? group by marca;")) {
+			ps.setDate(2, new java.sql.Date(dataOggi.getTime()));
+			ps.setDate(1, new java.sql.Date(dataMenoSeiMesi.getTimeInMillis()));
+			
+			try (ResultSet rs = ps.executeQuery();) {
+				while (rs.next()) {
+					teleTemp = new Televisore();
+					teleTemp.setMarca(rs.getString("marca"));
+					teleTemp.setModello(rs.getString("modello"));
+					teleTemp.setPollici(rs.getInt("pollici"));
+					teleTemp.setDataProduzione(rs.getDate("dataproduzione"));
+					teleTemp.setId(rs.getLong("ID"));
+					result.add(teleTemp.getMarca());
+				}
+			} // niente catch qui
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return result;
 	}
 
 	

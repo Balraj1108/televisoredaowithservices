@@ -36,6 +36,13 @@ public class TestTelevisore {
 			testTelevisoriProdottiIntervalloDate(televisoreService);
 			System.out.println("In tabella ci sono " + televisoreService.listAll().size() + " elementi.");
 			
+			testTelevisorePiuGrande(televisoreService);
+			System.out.println("In tabella ci sono " + televisoreService.listAll().size() + " elementi.");
+			
+			testMarcheTelevisoriUltimiSeiMesi(televisoreService);
+			System.out.println("In tabella ci sono " + televisoreService.listAll().size() + " elementi.");
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			// TODO: handle exception
@@ -134,10 +141,39 @@ public class TestTelevisore {
 				throw new RuntimeException("Test fallito");
 			}			
 		}
-		System.out.println(".......testTelevisoriProdottiIntervalloDate inizio.............");
+		System.out.println(".......testTelevisoriProdottiIntervalloDate PASSED.............");
 		
 	}
 	
+	private static void testTelevisorePiuGrande(TelevisoreService televisoreService) throws Exception {
+		System.out.println(".......testTelevisorePiuGrande inizio.............");
+		
+		Televisore televisoreGrande = new Televisore();
+		
+		televisoreGrande = televisoreService.televisorePiuGrande();
+		
+		Long idTelevisoreGrande = televisoreGrande.getId();
+		
+		Televisore televisoreGrandeControllo =  televisoreService.findById(idTelevisoreGrande);
+		
+		if (!(televisoreGrandeControllo.getPollici() == televisoreGrande.getPollici())) {
+			throw new RuntimeException("Test fallito");
+		}
+		
+		
+		System.out.println(".......testTelevisorePiuGrande PASSED.............");
+	}
 	
+	private static void testMarcheTelevisoriUltimiSeiMesi(TelevisoreService televisoreService) throws Exception{
+		System.out.println(".......testMarcheTelevisoriUltimiSeiMesi inizio.............");
+		
+		List<String> listaMarcheUltimiSeiMesi = new ArrayList<>();
+		
+		listaMarcheUltimiSeiMesi = televisoreService.marcheTelevisoriUltimiSeiMesi();
+		
+		System.out.println(listaMarcheUltimiSeiMesi);
+		
+		System.out.println(".......testMarcheTelevisoriUltimiSeiMesi PASSED.............");
+	}
 
 }
